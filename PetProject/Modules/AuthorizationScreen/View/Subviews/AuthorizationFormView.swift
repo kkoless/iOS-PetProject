@@ -140,12 +140,11 @@ private extension AuthorizationFormView {
 private extension AuthorizationFormView {
     @objc func loginButtonTap() {
         let gender: GenderType = genderSegmentedControl.selectedSegmentIndex == 0 ? .male : .female
-        guard let name = nameTextField.text, let age = Int(ageTextField.text ?? "0") else { return }
+        guard var name = nameTextField.text, let age = Int(ageTextField.text ?? "0") else { return }
+        name = name.trimmingCharacters(in: .whitespacesAndNewlines)
         if !name.isEmpty {
             loginButtonTapAction?(name, gender, age)
         }
-        nameTextField.text = ""
-        ageTextField.text = ""
     }
 }
 

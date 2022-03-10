@@ -28,43 +28,11 @@ final class ProfileScreenViewController: UIViewController {
         return imageView
     }()
     
-    private lazy var inputNameLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.font = UIFont.systemFont(ofSize: 15, weight: .regular)
-        label.text = "Введите новое имя"
-        label.textColor = .black
-        return label
-    }()
-    
-    private lazy var nameTextField: UITextField = {
-        let textField = UITextField(frame: .zero)
-        
-        textField.font = UIFont.systemFont(ofSize: 15, weight: .medium)
-        textField.placeholder = "Новое имя..."
-        textField.textColor = .black
-        textField.layer.borderWidth = 1
-        textField.layer.borderColor = CGColor(red: 0, green: 0, blue: 0, alpha: 1)
-        textField.layer.cornerRadius = 15
-        
-        return textField
-    }()
-    
-    private lazy var nameStackView: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [inputNameLabel, nameTextField])
-        stack.axis = .vertical
-        stack.setCustomSpacing(8, after: inputNameLabel)
-        stack.isHidden = true
-        return stack
-    }()
-    
     private lazy var changeThemeButton: UIButton = {
         makeButton(title: "Изменить фон", action: #selector(changeThemeButtonTap))
     }()
     private lazy var changeNameButton: UIButton = {
         makeButton(title: "Изменить имя", action: #selector(changeNameButtonTap))
-    }()
-    private lazy var saveNameButton: UIButton = {
-        makeButton(title: "Сохранить", isHidden: true, action: #selector(saveNameButtonTap))
     }()
     private lazy var enterButton: UIButton = {
         makeButton(title: "Далее", action: #selector(enterButtonTap))
@@ -111,33 +79,10 @@ private extension ProfileScreenViewController {
             $0.height.equalTo(300)
         }
     }
-    
-    func configureNameStackView() {
-        view.addSubview(nameStackView)
-        
-        nameTextField.snp.makeConstraints {
-            $0.height.equalTo(40)
-        }
-        
-        nameStackView.snp.makeConstraints {
-            $0.top.equalTo(profileImageView.snp.bottom).offset(20)
-            $0.leading.equalToSuperview().offset(16)
-            $0.trailing.equalToSuperview().inset(16)
-        }
-        
-        let paddingView: UIView = UIView(frame: CGRect(x: 0,
-                                                       y: 0,
-                                                       width: 15,
-                                                       height: nameTextField.frame.height)
-        )
-        nameTextField.leftView = paddingView
-        nameTextField.leftViewMode = .always
-    }
 
     func configureButtons() {
         view.addSubview(changeThemeButton)
         view.addSubview(changeNameButton)
-        view.addSubview(saveNameButton)
         view.addSubview(enterButton)
 
         changeThemeButton.snp.makeConstraints {
@@ -151,13 +96,6 @@ private extension ProfileScreenViewController {
         changeNameButton.snp.makeConstraints {
             $0.centerX.equalToSuperview()
             $0.top.equalTo(changeThemeButton.snp.bottom).offset(15)
-            $0.width.equalTo(changeThemeButton)
-            $0.height.equalTo(changeThemeButton)
-        }
-        
-        saveNameButton.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
-            $0.top.equalTo(nameStackView.snp.bottom).offset(20)
             $0.width.equalTo(changeThemeButton)
             $0.height.equalTo(changeThemeButton)
         }
@@ -177,20 +115,11 @@ private extension ProfileScreenViewController {
     }
 
     @objc func changeNameButtonTap() {
-        changeHiddenState(with: true)
+        presenter?.changeProfileName()
     }
 
     @objc func enterButtonTap() {
         presenter?.navigateToArticlesListScreen()
-    }
-    
-    @objc func saveNameButtonTap() {
-        guard let newName = nameTextField.text else { return }
-        if !newName.isEmpty {
-            presenter?.changeProfileName(name: newName)
-            nameTextField.text = ""
-            changeHiddenState(with: false)
-        }
     }
 }
 
@@ -199,7 +128,6 @@ extension ProfileScreenViewController: ProfilePresenterDelegate {
         view.backgroundColor = .white
         configureLabel(with: profile.name)
         configureImageView()
-        configureNameStackView()
         configureButtons()
     }
     
@@ -223,33 +151,15 @@ extension ProfileScreenViewController: ProfilePresenterDelegate {
 }
 
 private extension ProfileScreenViewController {
-    func changeHiddenState(with flag: Bool) {
-        UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseIn) { [weak self] in
-            self?.nameStackView.isHidden = !flag
-            self?.saveNameButton.isHidden = !flag
-            
-            self?.changeNameButton.isHidden = flag
-            self?.enterButton.isHidden = flag
-            self?.changeThemeButton.isHidden = flag
-        }
-        
-    }
-    
     func changeColorViews(with flag: Bool) {
         UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseIn) { [weak self] in
             UIApplication.shared.statusBarStyle = flag ? .lightContent : .darkContent
             
             self?.view.backgroundColor = flag ? .black : .white
-            self?.nameTextField.textColor = flag ? .white : .black
-            self?.nameTextField.layer.borderColor = flag ? CGColor(red: 255, green: 255, blue: 255, alpha: 1) : CGColor(red: 0, green: 0, blue: 0, alpha: 1)
             self?.welcomeLabel.textColor = flag ? .white : .black
-            self?.inputNameLabel.textColor = flag ? .white : .black
             
             self?.changeNameButton.setTitleColor(flag ? .black : .white, for: .normal)
             self?.changeNameButton.backgroundColor = flag ? .white : .black
-            
-            self?.saveNameButton.setTitleColor(flag ? .black : .white, for: .normal)
-            self?.saveNameButton.backgroundColor = flag ? .white : .black
             
             self?.enterButton.setTitleColor(flag ? .black : .white, for: .normal)
             self?.enterButton.backgroundColor = flag ? .white : .black

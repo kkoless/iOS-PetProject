@@ -10,13 +10,12 @@ import Foundation
 protocol ProfilePresenterDelegate: AnyObject {
     func setupUI(with profile: Profile)
     func updateTheme()
-    func updateLabelText(with name: String)
 }
 
 protocol ProfilePresenterProtocol: AnyObject {
     func configureUI()
     func navigateToArticlesListScreen()
-    func changeProfileName(name: String)
+    func changeProfileName()
     func changeTheme()
 }
 
@@ -37,9 +36,8 @@ final class ProfilePresenter {
         coordinator?.navigateToArticlesListScreen()
     }
     
-    func changeProfileName(name: String) {
-        self.profile.name = name
-        viewDelegate?.updateLabelText(with: profile.name)
+    func changeProfileName() {
+        coordinator?.pop()
     }
     
     func changeTheme() {
