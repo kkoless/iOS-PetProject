@@ -142,7 +142,8 @@ private extension AuthorizationFormView {
         let gender: GenderType = genderSegmentedControl.selectedSegmentIndex == 0 ? .male : .female
         guard var name = nameTextField.text, let age = Int(ageTextField.text ?? "0") else { return }
         name = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !name.isEmpty {
+        let ageCondition = age != 0 && age <= 110
+        if !name.isEmpty && ageCondition {
             loginButtonTapAction?(name, gender, age)
         }
     }
